@@ -78,7 +78,7 @@ def extract_words(text):
         elif i == length and char in ascii_letters:
             word += char
             newList += [str(word)]
-        elif (word = ' '):
+        elif (word == ' '):
             newList += [str(word)]
             word = ""
         else:
@@ -186,14 +186,42 @@ def find_centroid(polygon):
 
     >>> p1, p2, p3 = make_position(1, 2), make_position(3, 4), make_position(5, 0)
     >>> triangle = [p1, p2, p3, p1]  # First vertex is also the last vertex
-    >>> find_centroid(triangle)
-    (3.0, 2.0, 6.0)
-    >>> find_centroid([p1, p3, p2, p1])
-    (3.0, 2.0, 6.0)
     >>> tuple(map(float, find_centroid([p1, p2, p1])))  # A zero-area polygon
     (1.0, 2.0, 0.0)
     """
-    "*** YOUR CODE HERE ***"
+    # find area
+
+    area = 0
+    pos = 0
+    while len(polygon)-1 > pos:
+        area+=(latitude(polygon[pos])*longitude(polygon[pos+1])-(latitude(polygon[pos+1])*longitude(polygon[pos]))) # area equation
+        pos = pos + 1# increment the position index
+    area = area * (.5)
+    new_area = area      # variable that holds the area of polygon we are working with currently
+    
+    #if the area of the polygon is 0, this returns the initial position
+    if new_area == 0:
+        return (latitude(polygon[0]), longitude(polygon[0]), 0)
+    
+    #finds the central latitude
+    center_lat = 0         # initalize center latitude value and pos value
+    pos = 0
+    while len(polygon)-1 > pos:
+    # calculate first part of overall latitiude calculation for each polygon
+       center_lat += (latitude(polygon[pos])+latitude(polygon[pos+1]))*(latitude(polygon[pos])*latitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
+       pos+=1
+    center_lat = (center_lat)/(6*area)
+        
+    
+    pos = 0
+    center_long = 0
+    while len(polygon)-1 > pos:
+        center_long += (longitude(polygon[pos])+longitude(polygon[pos+1]))*(latitude(polygon[pos])*longitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
+        pos+=1
+    center_long = (center_long)/(6*area) # might be wrong 
+     
+    
+    return center_lat, center_long, abs(area)
 
 def find_center(polygons):
     """Compute the geographic center of a state, averaged over its polygons.
@@ -216,7 +244,17 @@ def find_center(polygons):
     >>> round(longitude(hi), 5)
     -156.21763
     """
-    "*** YOUR CODE HERE ***"
+  
+    area_sum, sum_x, sum_y = 0, 0, 0
+    for shape in polygons:  #iterates between all the shapes in list
+        centroid = find_centroid(shape)
+        area = centroid[2]
+        area_sum += centroid[2]
+        sum_x += centroid[0]*area  #adds latitude of centroid * prev area
+        sum_y += centroid[1]*area  #adds longitude of centroid * prev area
+    gen_center_x = sum_x/area_sum  #finds general center of latitudes
+    gen_center_y = sum_y/area_sum  #finds general center of longitudes
+    return make_position(gen_center_x, gen_center_y)
 
 
 # Phase 3: The Mood of the Nation
