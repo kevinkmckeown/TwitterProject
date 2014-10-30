@@ -111,7 +111,10 @@ def make_sentiment(value):
 def has_sentiment(s):
     """Return whether sentiment s has a value."""
     "*** YOUR CODE HERE ***"
-    return s != None    #returns true if s has a value
+    if s == None:
+        return False
+    else:
+        return True
 
 def sentiment_value(s):
     """Return the value of a sentiment s."""
