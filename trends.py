@@ -165,7 +165,9 @@ def analyze_tweet_sentiment(tweet):
     for word in text:
         if has_sentiment(get_word_sentiment(word)) == True:
             total = total + sentiment_value(get_word_sentiment(word)) #total sum of sentiment values
-            counter = counter +1
+            counter = counter + 1
+    if counter == 0: 
+        return make_sentiment(None)
     average = make_sentiment(total/counter) #average sentiment of all words
     return average
 
@@ -441,7 +443,7 @@ def group_tweets_by_hour(tweets):
     NY : -0.04688
     HOUR: 9
     CA : 0.10417
-    NY : 0.25 
+    NY : 0.25
     HOUR: 17
     CA : 0.09808
     FL : 0.0875
@@ -464,7 +466,6 @@ def group_tweets_by_hour(tweets):
             tweets_by_hour[hour] += [tweet,]
             
     return tweets_by_hour
-
 
 
 # Interaction.  You don't need to read this section of the program.
