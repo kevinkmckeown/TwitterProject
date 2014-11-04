@@ -71,6 +71,8 @@ def extract_words(text):
     word = ""
 
     for char in charList:
+        length = len(charList)
+        i=i+1
         if char not in ascii_letters:
             if word != "":
                 newList += [str(word)]
@@ -78,13 +80,11 @@ def extract_words(text):
         elif i == length and char in ascii_letters:
             word += char
             newList += [str(word)]
-        elif (word == ' '):
+        elif word == ' ':
             newList += [str(word)]
             word = ""
         else:
-            word+= char
-        i=i+1
-        length = len(charList)
+            word+= char       
     return newList
 
 def make_sentiment(value):
@@ -193,35 +193,42 @@ def find_centroid(polygon):
 
     area = 0
     pos = 0
+    
     while len(polygon)-1 > pos:
         area+=(latitude(polygon[pos])*longitude(polygon[pos+1])-(latitude(polygon[pos+1])*longitude(polygon[pos]))) # area equation
-        pos = pos + 1# increment the position index
-    area = area * (.5)
-    new_area = area      # variable that holds the area of polygon we are working with currently
+        pos = pos + 1   # increment the position index
+    area = area * (.5)  # final part of area calculation
+    newArea = area      # variable that holds the area of polygon we are working with currently
     
     #if the area of the polygon is 0, this returns the initial position
-    if new_area == 0:
+    if newArea == 0:
         return (latitude(polygon[0]), longitude(polygon[0]), 0)
     
-    #finds the central latitude
-    center_lat = 0         # initalize center latitude value and pos value
+    # finds the central latitude
+    # initalize center latitude value and pos value
+    centerLat = 0         
     pos = 0
     while len(polygon)-1 > pos:
-    # calculate first part of overall latitiude calculation for each polygon
-       center_lat += (latitude(polygon[pos])+latitude(polygon[pos+1]))*(latitude(polygon[pos])*latitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
-       pos+=1
-    center_lat = (center_lat)/(6*area)
+       # calculate first part of overall latitiude calculation for each polygon
+       centerLat += (latitude(polygon[pos])+latitude(polygon[pos+1]))*(latitude(polygon[pos])*longitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
+       pos+=1   # increment the pos variable to access next polygon
+
+    # calculate second part of overall latitude calculation for each polygon
+    centerLat = (centerLat)/(6*area)    
         
-    
+
+    #finds the cenral longitude
     pos = 0
-    center_long = 0
+    centerLong = 0      # initalize center longitude value and pos value
     while len(polygon)-1 > pos:
-        center_long += (longitude(polygon[pos])+longitude(polygon[pos+1]))*(latitude(polygon[pos])*longitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
+        # calculate first part of overall longitude calculation for each polygon
+        centerLong += (longitude(polygon[pos])+longitude(polygon[pos+1]))*(latitude(polygon[pos])*longitude(polygon[pos+1])-latitude(polygon[pos+1])*longitude(polygon[pos]))
         pos+=1
-    center_long = (center_long)/(6*area) # might be wrong 
+    # calculate first part of overall latitude calculation for each polygon
+    centerLong = (centerLong)/(6*area) 
      
     
-    return center_lat, center_long, abs(area)
+    return (centerLat, centerLong, abs(area))
 
 def find_center(polygons):
     """Compute the geographic center of a state, averaged over its polygons.
@@ -245,16 +252,23 @@ def find_center(polygons):
     -156.21763
     """
   
-    area_sum, sum_x, sum_y = 0, 0, 0
-    for shape in polygons:  #iterates between all the shapes in list
-        centroid = find_centroid(shape)
+    areaSum = 0
+    sumX = 0
+    sumY = 0
+
+    #cycle through the shapes in the polygon list
+    for shape in polygons:  
+        centroid = find_centroid(shape) # returns (x-coordinate, y-coordinate, area)
+        areaSum = areaSum + centroid[2] # add area of centroid to total sum for area
         area = centroid[2]
-        area_sum += centroid[2]
-        sum_x += centroid[0]*area  #adds latitude of centroid * prev area
-        sum_y += centroid[1]*area  #adds longitude of centroid * prev area
-    gen_center_x = sum_x/area_sum  #finds general center of latitudes
-    gen_center_y = sum_y/area_sum  #finds general center of longitudes
-    return make_position(gen_center_x, gen_center_y)
+        sumX = sumX + area*centroid[0]  # add (area*x-coordinate of centeroid) to total
+        sumY = sumY + area*centroid[1]  # add (area*y-coordinate of centeroid) to total
+    genCentX = sumX/areaSum  # calculate the general center of latitude
+    genCentY = sumY/areaSum  # calculate the general center of longitude
+    
+    return make_position(genCentX, genCentY)
+
+
 
 
 # Phase 3: The Mood of the Nation
@@ -330,7 +344,7 @@ def most_talkative_state(term):
         stateCounter[state] = count
         count = 0
     mostStateTweet= None
-    for state_key in stateCounter[state_key]
+    for state_key in stateCounter:
         if mostStateTweet == None:
             mostStateTweet = stateCounter[state_key]
             state=state_key
