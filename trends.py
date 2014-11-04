@@ -456,12 +456,12 @@ def group_tweets_by_hour(tweets):
     """
     tweets_by_hour = {}
     "*** YOUR CODE HERE ***"
-    for each_tweet in tweets:
-        hour = tweet_time(each_tweet).hour 
+    for tweet in tweets:
+        hour = tweet_time(tweet).hour 
         if hour not in tweets_by_hour:
-            tweets_by_hour[hour] = [each_tweet,]
+            tweets_by_hour[hour] = [tweet,]
         else:
-            tweets_by_hour[hour] += [each_tweet,]
+            tweets_by_hour[hour] += [tweet,]
             
     return tweets_by_hour
 
