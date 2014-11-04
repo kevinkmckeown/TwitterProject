@@ -296,7 +296,16 @@ def group_tweets_by_state(tweets):
     tweets_by_state = {}
     us_centers = {n: find_center(s) for n, s in us_states.items()}
     '''*** YOUR CODE HERE ***'''
+    us_centers = {n: find_center(s) for n, s in us_states.items()} 
+    for tweet in tweets:
+        location = find_closest_state(tweet,us_centers)
+        if location in tweets_by_state:
+            tweets_by_state[location] += [tweet,]
+        else:
+            tweets_by_state[location] = [tweet,]
+            
     return tweets_by_state
+
 
 def most_talkative_state(term):
     """Return the state that has the largest number of tweets containing term.
@@ -311,6 +320,25 @@ def most_talkative_state(term):
     """
     tweets = load_tweets(make_tweet, term)  # A list of tweets containing term
     "*** YOUR CODE HERE ***"
+    stateCounter = {}
+    count = 0
+    tweet_state_1 = group_tweets_by_state(tweets)
+    for state in tweet_state_1:
+        for tweet in tweet_state_1[state]:
+            if term in tweet_words(tweets):
+                count += 1
+        stateCounter[state] = count
+        count = 0
+    mostStateTweet= None
+    for state_key in stateCounter[state_key]
+        if mostStateTweet == None:
+            mostStateTweet = stateCounter[state_key]
+            state=state_key
+        elif stateCounter[state_key] > most_state_tweet:
+            mostStateTweet = stateCounter[state_key]
+            state = state_key
+
+    return state        
 
 def average_sentiments(tweets_by_state):
     """Calculate the average sentiment of the states by averaging over all
