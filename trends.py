@@ -441,7 +441,7 @@ def group_tweets_by_hour(tweets):
     NY : -0.04688
     HOUR: 9
     CA : 0.10417
-    NY : 0.25
+    NY : 0.25 
     HOUR: 17
     CA : 0.09808
     FL : 0.0875
@@ -456,7 +456,15 @@ def group_tweets_by_hour(tweets):
     """
     tweets_by_hour = {}
     "*** YOUR CODE HERE ***"
+    for each_tweet in tweets:
+        hour = tweet_time(each_tweet).hour 
+        if hour not in tweets_by_hour:
+            tweets_by_hour[hour] = [each_tweet,]
+        else:
+            tweets_by_hour[hour] += [each_tweet,]
+            
     return tweets_by_hour
+
 
 
 # Interaction.  You don't need to read this section of the program.
