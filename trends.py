@@ -292,6 +292,19 @@ def find_closest_state(tweet, state_centers):
     'NJ'
     """
     "*** YOUR CODE HERE ***"
+    
+    distList = {}
+    pos = tweet_location(tweet)
+    stateKey = ""
+    
+    for center in state_centers:
+        distance = geo_distance(pos, state_centers[center])
+        distList[center] = distance
+    for state in distList:
+        if distList[state] < distance:
+            distance = distList[state]
+            stateKey = state
+    return stateKey
 
 def group_tweets_by_state(tweets):
     """Return a dictionary that aggregates tweets by their nearest state center.
@@ -308,11 +321,12 @@ def group_tweets_by_state(tweets):
     '"welcome to san francisco" @ (38, -122)'
     """
     tweets_by_state = {}
-    us_centers = {n: find_center(s) for n, s in us_states.items()}
+    
     '''*** YOUR CODE HERE ***'''
-    us_centers = {n: find_center(s) for n, s in us_states.items()} 
+    usCenters = {n: find_center(s) for n, s in us_states.items()}
+    
     for tweet in tweets:
-        location = find_closest_state(tweet,us_centers)
+        location = find_closest_state(tweet,usCenters)
         if location in tweets_by_state:
             tweets_by_state[location] += [tweet,]
         else:
@@ -327,7 +341,6 @@ def most_talkative_state(term):
     If multiple states tie for the most talkative, return any of them.
 
     >>> most_talkative_state('texas')
-
     'TX'
     >>> most_talkative_state('soup')
     'CA'
@@ -336,21 +349,21 @@ def most_talkative_state(term):
     "*** YOUR CODE HERE ***"
     stateCounter = {}
     count = 0
-    tweet_state_1 = group_tweets_by_state(tweets)
-    for state in tweet_state_1:
-        for tweet in tweet_state_1[state]:
-            if term in tweet_words(tweets):
+    tweetState= group_tweets_by_state(tweets)
+    for state in tweetState:
+        for tweet in tweetState[state]:
+            if term in tweet_words(tweet):
                 count += 1
         stateCounter[state] = count
         count = 0
     mostStateTweet= None
-    for state_key in stateCounter:
+    for stateKey in stateCounter:
         if mostStateTweet == None:
-            mostStateTweet = stateCounter[state_key]
-            state=state_key
-        elif stateCounter[state_key] > most_state_tweet:
-            mostStateTweet = stateCounter[state_key]
-            state = state_key
+            mostStateTweet = stateCounter[stateKey]
+            state=stateKey
+        elif stateCounter[stateKey] > mostStateTweet:
+            mostStateTweet = stateCounter[stateKey]
+            state = stateKey
 
     return state        
 
@@ -368,6 +381,23 @@ def average_sentiments(tweets_by_state):
     """
     averaged_state_sentiments = {}
     "*** YOUR CODE HERE ***"
+    
+    for state in tweets_by_state:
+        if len(state) != 0:
+            
+            sentCount = 0
+            totalSent =  0
+
+            for tweet in tweets_by_state[state]:
+                
+                sentiment = analyze_tweet_sentiment(tweet)
+                if sentiment != None:
+                    totalSent += sentiment
+                    sentCount = sentCount + 1
+                
+            if sentCount != 0:
+                averaged_state_sentiments[state] = totalSent/sentCount
+                
     return averaged_state_sentiments
 
 
